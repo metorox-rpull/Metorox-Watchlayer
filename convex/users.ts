@@ -3,6 +3,7 @@ import { mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel.d.ts";
 import type { MutationCtx, QueryCtx } from "./_generated/server.d.ts";
 
+// Helper: get authenticated user or throw
 export async function requireUser(ctx: QueryCtx | MutationCtx) {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
@@ -18,6 +19,7 @@ export async function requireUser(ctx: QueryCtx | MutationCtx) {
   return user;
 }
 
+// Helper: require membership in a workspace
 export async function requireMembership(
   ctx: QueryCtx | MutationCtx,
   userId: Id<"users">,
@@ -35,6 +37,7 @@ export async function requireMembership(
   return membership;
 }
 
+// Helper: require owner role
 export async function requireOwner(
   ctx: QueryCtx | MutationCtx,
   userId: Id<"users">,
@@ -59,6 +62,7 @@ export const updateCurrentUser = mutation({
       .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
       .unique();
     if (user !== null) {
+      // Update name/email if changed
       if (user.name !== identity.name || user.email !== identity.email) {
         await ctx.db.patch(user._id, { name: identity.name, email: identity.email });
       }
@@ -84,6 +88,7 @@ export const getCurrentUser = query({
   },
 });
 
+// Check if the current user has any workspaces
 export const hasWorkspace = query({
   args: {},
   handler: async (ctx) => {
