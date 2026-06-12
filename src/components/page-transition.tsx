@@ -6,10 +6,6 @@ type Props = {
   className?: string;
 };
 
-/**
- * Wraps page content in a subtle fade + slide-up animation.
- * Use this as the root wrapper in each page component.
- */
 export default function PageTransition({ children, className }: Props) {
   return (
     <motion.div
