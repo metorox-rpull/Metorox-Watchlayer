@@ -14,9 +14,7 @@ import ReportsPage from "./pages/app/reports/page.tsx";
 import SettingsPage from "./pages/app/settings/page.tsx";
 import OnboardingPage from "./pages/app/onboarding/page.tsx";
 import AcceptInvitePage from "./pages/app/invite/page.tsx";
-
 import MonitorDetailPage from "./pages/app/monitors/monitorId/page.tsx";
-
 import IncidentDetailPage from "./pages/app/incidents/incidentId/page.tsx";
 import StatusPage from "./pages/status/page.tsx";
 import ClientReportPage from "./pages/report/page.tsx";
