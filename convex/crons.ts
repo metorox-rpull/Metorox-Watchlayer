@@ -6,6 +6,12 @@ const crons = cronJobs();
 // Run due monitors every 15 minutes (the minimum check frequency)
 crons.interval("run due monitors", { minutes: 15 }, internal.runner.index.runDueMonitors, {});
 
+// Check heartbeat monitors every minute
+crons.interval("check missed heartbeats", { minutes: 1 }, internal.heartbeat.checkMissedHeartbeats, {});
+
+// Check SSL certificates for all verified sites once per day at 2 AM UTC
+crons.daily("check ssl certificates", { hourUTC: 2, minuteUTC: 0 }, internal.sslActions.checkAllSslCerts, {});
+
 // Send daily digest emails at 8 AM UTC
 crons.daily("daily digest emails", { hourUTC: 8, minuteUTC: 0 }, internal.digestCron.sendAllDigests, {});
 
