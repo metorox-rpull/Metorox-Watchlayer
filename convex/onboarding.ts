@@ -2,6 +2,10 @@ import { query } from "./_generated/server";
 import { v } from "convex/values";
 import { requireUser } from "./users.ts";
 
+/**
+ * Returns the onboarding checklist completion status for a workspace.
+ * Steps: add a site, add a monitor, invite a teammate, run first monitor check.
+ */
 export const getChecklistStatus = query({
   args: { workspaceId: v.id("workspaces") },
   handler: async (ctx, args) => {

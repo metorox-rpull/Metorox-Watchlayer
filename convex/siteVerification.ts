@@ -2,8 +2,10 @@ import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api.js";
 
+// Check DNS TXT record for the verification token
 async function checkDnsTxt(domain: string, token: string): Promise<{ ok: boolean; reason?: string }> {
   try {
+    // Use a public DNS-over-HTTPS API (Cloudflare)
     const hostname = domain.replace(/^https?:\/\//, "").split("/")[0].split(":")[0];
     const res = await fetch(`https://cloudflare-dns.com/dns-query?name=${hostname}&type=TXT`, {
       headers: { Accept: "application/dns-json" },
@@ -23,6 +25,7 @@ async function checkDnsTxt(domain: string, token: string): Promise<{ ok: boolean
   }
 }
 
+// Check HTML meta tag presence on the homepage
 async function checkMetaTag(baseUrl: string, token: string): Promise<{ ok: boolean; reason?: string }> {
   try {
     const url = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
@@ -36,6 +39,7 @@ async function checkMetaTag(baseUrl: string, token: string): Promise<{ ok: boole
       redirect: "follow",
     });
     clearTimeout(timeout);
+
     if (!res.ok) {
       return { ok: false, reason: `Site returned HTTP ${res.status}. Make sure the site is reachable.` };
     }
@@ -63,15 +67,19 @@ export const runVerification = action({
     token: v.string(),
   },
   handler: async (ctx, args): Promise<{ ok: boolean; reason?: string }> => {
+    // Mark as checking
     await ctx.runMutation(api.sites.setVerificationChecking, {
       verificationId: args.verificationId,
     });
+
     let result: { ok: boolean; reason?: string };
+
     if (args.method === "dns_txt") {
       result = await checkDnsTxt(args.baseUrl, args.token);
     } else {
       result = await checkMetaTag(args.baseUrl, args.token);
     }
+
     if (result.ok) {
       await ctx.runMutation(api.sites.markSiteVerified, {
         siteId: args.siteId,
@@ -83,6 +91,7 @@ export const runVerification = action({
         failureReason: result.reason ?? "Verification failed",
       });
     }
+
     return result;
   },
 });
