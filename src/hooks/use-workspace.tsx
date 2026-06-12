@@ -23,11 +23,13 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   const workspaces = useQuery(api.workspaces.listMyWorkspaces);
 
+  // Auto-select first workspace if none selected
   useEffect(() => {
     if (!workspaceId && workspaces && workspaces.length > 0) {
       setWorkspaceIdState(workspaces[0]._id);
       localStorage.setItem(WORKSPACE_KEY, workspaces[0]._id);
     }
+    // Clear stored id if not in list
     if (workspaceId && workspaces && workspaces.length > 0) {
       const found = workspaces.find((w) => w._id === workspaceId);
       if (!found) {

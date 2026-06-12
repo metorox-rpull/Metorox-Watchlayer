@@ -19,6 +19,7 @@ import MonitorDetailPage from "./pages/app/monitors/monitorId/page.tsx";
 
 import IncidentDetailPage from "./pages/app/incidents/incidentId/page.tsx";
 import StatusPage from "./pages/status/page.tsx";
+import ClientReportPage from "./pages/report/page.tsx";
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/invite/:token" element={<AcceptInvitePage />} />
           <Route path="/status/:slug" element={<StatusPage />} />
+          <Route path="/report/:token" element={<ClientReportPage />} />
 
           {/* Onboarding — outside app shell */}
           <Route path="/app/onboarding" element={<OnboardingPage />} />
