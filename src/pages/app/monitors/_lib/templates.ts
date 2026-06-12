@@ -13,11 +13,14 @@ export type MonitorTemplate = {
   category: "lead_gen" | "brochure" | "ecommerce" | "general";
   type: "page" | "journey";
   defaultFrequencyMinutes: number;
+  // Pre-filled steps for journey templates
   steps?: JourneyStep[];
+  // Test data fields required by this template
   testDataFields?: { key: string; label: string; placeholder: string; required: boolean }[];
 };
 
 export const TEMPLATES: MonitorTemplate[] = [
+  // ---- Lead Gen ----
   {
     slug: "lead-gen-contact-form",
     name: "Contact Form Submission",
@@ -58,6 +61,7 @@ export const TEMPLATES: MonitorTemplate[] = [
       { key: "success_text", label: "Success text to check", placeholder: "Thanks for subscribing", required: true },
     ],
   },
+  // ---- Brochure ----
   {
     slug: "brochure-homepage",
     name: "Homepage Availability",
@@ -83,6 +87,7 @@ export const TEMPLATES: MonitorTemplate[] = [
       { key: "cta_selector", label: "CTA CSS selector", placeholder: "a.btn-primary", required: true },
     ],
   },
+  // ---- General ----
   {
     slug: "general-page-load",
     name: "Page Load Check",
