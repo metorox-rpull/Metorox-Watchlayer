@@ -276,6 +276,28 @@ export default defineSchema({
     .index("by_token", ["token"])
     .index("by_site", ["siteId"]),
 
+  // SSL Certificate data per site
+  sslCerts: defineTable({
+    workspaceId: v.id("workspaces"),
+    siteId: v.id("sites"),
+    checkedAt: v.string(), // ISO 8601
+    validFrom: v.optional(v.string()), // ISO 8601
+    validTo: v.optional(v.string()), // ISO 8601 expiry
+    issuer: v.optional(v.string()),
+    subject: v.optional(v.string()),
+    status: v.union(
+      v.literal("valid"),
+      v.literal("expiring_soon"), // < 30 days
+      v.literal("critical"),      // < 7 days
+      v.literal("expired"),
+      v.literal("error"),
+    ),
+    daysUntilExpiry: v.optional(v.number()),
+    errorMessage: v.optional(v.string()),
+  })
+    .index("by_site", ["siteId"])
+    .index("by_workspace", ["workspaceId"]),
+
   // Public API keys — per workspace, used to authenticate REST API requests
   apiKeys: defineTable({
     workspaceId: v.id("workspaces"),
@@ -295,9 +317,9 @@ export default defineSchema({
     workspaceId: v.id("workspaces"),
     siteId: v.id("sites"),
     name: v.string(),
-    type: v.union(v.literal("page"), v.literal("journey")),
+    type: v.union(v.literal("page"), v.literal("journey"), v.literal("heartbeat")),
     status: v.union(v.literal("active"), v.literal("paused")),
-    frequencyMinutes: v.number(), // 15, 60, 360, 1440
+    frequencyMinutes: v.number(), // 15, 60, 360, 1440 for page/journey; heartbeat interval in minutes
     // For page monitors
     url: v.optional(v.string()),
     // Optional keyword that must appear in the response body
@@ -312,9 +334,28 @@ export default defineSchema({
     multiRegionEnabled: v.optional(v.boolean()),
     // SLA target uptime percentage, e.g. 99.9 (null = no SLA goal set)
     slaTarget: v.optional(v.number()),
+    // --- Heartbeat monitor fields ---
+    // Secret token used in the ping URL
+    heartbeatToken: v.optional(v.string()),
+    // Last time a valid ping was received (ISO 8601)
+    lastPingAt: v.optional(v.string()),
+    // Time we first detected the heartbeat was missed (ISO 8601)
+    missedAt: v.optional(v.string()),
     deletedAt: v.optional(v.string()),
+    // Array of tag strings e.g. ["production", "checkout-flow"]
+    tags: v.optional(v.array(v.string())),
   })
     .index("by_workspace", ["workspaceId"])
     .index("by_site", ["siteId"])
-    .index("by_workspace_and_status", ["workspaceId", "status"]),
+    .index("by_workspace_and_status", ["workspaceId", "status"])
+    .index("by_heartbeat_token", ["heartbeatToken"]),
+
+  // Monitor tag definitions per workspace (name + color)
+  monitorTags: defineTable({
+    workspaceId: v.id("workspaces"),
+    name: v.string(),
+    color: v.string(), // hex color e.g. "#7c3aed"
+  })
+    .index("by_workspace", ["workspaceId"])
+    .index("by_workspace_and_name", ["workspaceId", "name"]),
 });
